@@ -38,13 +38,14 @@ const Write = () => {
   };
 
   useEffect(() => {
-    const { query } = router.query
+    const urlQuery: any = router.query
       ? router.query.length
         ? router.query[0]
         : router.query
       : "";
 
-    const { a: mbid } = router.query;
+    const mbid = urlQuery["a"];
+
     getAlbum(mbid as string).then((album) => {
       setAlbum(album);
       setTrackRatings(album.tracks!.map((_) => 0));

@@ -64,37 +64,13 @@ const Dashboard = () => {
     reviews
       .then((rev) => {
         console.log(rev.data);
-        return renderReviews(rev.data as Review);
+        return renderReviews(rev.data as Review[]);
       })
       .then((data) => setReviewCarousel(data));
   }, []);
 
-  const albums: Album[] = [
-    {
-      album_id: "9c4fa061-3e6a-48b5-a23e-e4a8942b94e9",
-      name: "Dreamland",
-      artist: "Glass Animals",
-      cover_img:
-        "https://ia902307.us.archive.org/20/items/mbid-e3fc1cd4-d180-4f3a-bc95-e89d33d8a7b2/mbid-e3fc1cd4-d180-4f3a-bc95-e89d33d8a7b2-26924614391_thumb500.jpg",
-      release: "2020-08-07",
-    },
-    {
-      album_id: "9ea10987-df41-4691-b431-d4bb09d5506c",
-      name: "Is This It",
-      artist: "The Strokes",
-      cover_img:
-        "https://coverartarchive.org/release-group/efea26d1-a016-30f6-b8e2-bc8c02336b0a/front",
-      release: "2020-08-07",
-    },
-    {
-      album_id: "e775b7e1-8d3c-49e0-869f-3835bb2a3632",
-      name: "10,000 gecs",
-      artist: "100 gecs",
-      cover_img:
-        "https://coverartarchive.org/release-group/d73daa13-b571-41dd-8dfd-740fde3fda7d/front",
-      release: "2020-08-07",
-    },
-  ];
+  const albums: Album[] = [];
+
   return (
     <main>
       <Navbar />

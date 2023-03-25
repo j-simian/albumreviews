@@ -11,8 +11,8 @@ export type Album = {
   name: string;
   artist: string;
   release?: string;
-  cover_img?: string;
-  tracks?: [Track];
+  cover_img: string;
+  tracks: Track[];
 };
 
 export type Track = {

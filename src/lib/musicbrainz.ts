@@ -4,8 +4,70 @@ const apiRoot = "https://musicbrainz.org/ws/2/";
 const coverRoot = "https://coverartarchive.org/";
 
 type MbReleaseGroup = {
+  "artist-credit": MbArtist[];
+  disambiguation: string;
+  "first-release-date": string;
+  id: string;
+  "primary-type": string;
+  "primary-type-id": string;
+  releases: MbRelease[];
+  "secondary-type-ids": string[];
+  "secondary-types": string[];
+  title: string;
+};
 
-}
+type MbRelease = {
+  asin: string;
+  barcode: string;
+  country: string;
+  "cover-art-archive": {
+    artwork: boolean;
+    back: boolean;
+    front: boolean;
+    count: number;
+    darkened: boolean;
+  };
+  date: string;
+  disambiguation: string;
+  id: string;
+  media: MbMedia[];
+  packaging: string;
+  quality: string;
+  "release-events": any[];
+  status: string;
+  "status-id": string;
+  "text-representation": {
+    language: string;
+    script: string;
+  };
+  title: string;
+};
+
+type MbMedia = {
+  discs: any[];
+  format: string;
+  "format-id": string;
+  position: number;
+  title: string;
+  "track-count": number;
+  "track-offset": number;
+  tracks: MbTrack[];
+};
+
+type MbTrack = {
+  id: string;
+  length: number;
+  number: string;
+  position: number;
+  title: string;
+  recording: any;
+};
+
+type MbArtist = {
+  name: string;
+  joinphrase: string;
+  artist: any;
+};
 
 export async function searchAlbums(query: string): Promise<Album[]> {
   const apiRequest =
@@ -16,7 +78,7 @@ export async function searchAlbums(query: string): Promise<Album[]> {
   const response = await fetch(apiRequest);
   const data = await response.json();
 
-  const objs = data["release-groups"].map(async (data) => {
+  const objs = data["release-groups"].map(async (data: MbReleaseGroup) => {
     const cover_img_req = await fetch(
       `${coverRoot}release-group/${data.id}/front-250`
     );
@@ -40,7 +102,8 @@ export async function getAlbum(mbid: string): Promise<Album> {
       mbid
     )}?inc=releases%20artists%20discids&fmt=json`;
   console.clear();
-  const groupData = await makeRequest(groupRequest);
+  const groupData: MbReleaseGroup = await makeRequest(groupRequest);
+  console.log(groupData);
 
   // Get Release data, and track info
   const primaryRelease = groupData.releases.sort((a, b) => {
@@ -59,7 +122,7 @@ export async function getAlbum(mbid: string): Promise<Album> {
     `release/${encodeURI(
       primaryRelease.id
     )}?inc=recordings%20media%20discids&fmt=json`;
-  const releaseData = await makeRequest(releaseRequest);
+  const releaseData: MbRelease = await makeRequest(releaseRequest);
 
   // // Get Tracklist
   const tracks = releaseData.media[0].tracks;
@@ -76,10 +139,10 @@ export async function getAlbum(mbid: string): Promise<Album> {
     artist: groupData["artist-credit"]
       ? groupData["artist-credit"]
           .map((artist) => artist.name)
-          .join(groupData["artist-credit"].joinphrase)
+          .join(groupData["artist-credit"][0].joinphrase)
       : "",
     cover_img: imgUrl || "",
-    tracks: tracks.map((track) => ({
+    tracks: tracks.map((track: MbTrack) => ({
       name: track.title,
       length: track.length / 1000,
     })),
@@ -87,9 +150,9 @@ export async function getAlbum(mbid: string): Promise<Album> {
   return album;
 }
 
-const getAlbumArt = async (mbid: string) => {
+export const getAlbumArt = async (mbid: string) => {
   const cover_img_req = await fetch(
-    `${coverRoot}release-group/${groupData.id}/front-500`
+    `${coverRoot}release-group/${mbid}/front-500`
   );
   const imgUrl = URL.createObjectURL(await cover_img_req.blob());
   return imgUrl;

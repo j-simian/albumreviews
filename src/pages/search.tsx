@@ -8,11 +8,13 @@ import { useEffect, useState } from "react";
 const Search = () => {
   const router = useRouter();
   console.log(router.query);
-  const { query } = router.query
+	const urlQuery: any = router.query
     ? router.query.length
       ? router.query[0]
       : router.query
     : "";
+
+  const query: string = urlQuery["query"];
 
   let [albums, setAlbums] = useState<Album[]>([]);
 
