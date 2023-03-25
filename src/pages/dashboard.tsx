@@ -1,6 +1,8 @@
+import AlbumArt from "@/components/AlbumArt";
 import Carousel from "@/components/Carousel";
 import Navbar from "@/components/Navbar";
 import { getSupabase } from "@/lib/db";
+import { getAlbum } from "@/lib/musicbrainz";
 import { Album, Review } from "@/lib/types";
 import { getAuth } from "firebase/auth";
 import Image from "next/image";
@@ -10,7 +12,6 @@ import { useEffect, useState } from "react";
 const Dashboard = () => {
   const auth = getAuth();
   const router = useRouter();
-  const db = getSupabase();
 
   const [reviewsCarousel, setReviewCarousel] = useState(<></>);
 
@@ -20,36 +21,16 @@ const Dashboard = () => {
     }
   });
 
-  const reviews: Review[] = [
-    {
-      review_id: "644a6b71-fea2-4365-94be-79585cdc3402",
-      user_id: "3Douh5zN6KdkPT68l5TUJ3YneWD3",
-      album_id: "9c4fa061-3e6a-48b5-a23e-e4a8942b94e9",
-      rating: 9,
-    },
-    {
-      review_id: "644a6b71-fea2-4365-94be-79585cdc3402",
-      user_id: "3Douh5zN6KdkPT68l5TUJ3YneWD3",
-      album_id: "9c4fa061-3e6a-48b5-a23e-e4a8942b94e9",
-      rating: 9,
-    },
-    {
-      review_id: "644a6b71-fea2-4365-94be-79585cdc3402",
-      user_id: "3Douh5zN6KdkPT68l5TUJ3YneWD3",
-      album_id: "9c4fa061-3e6a-48b5-a23e-e4a8942b94e9",
-      rating: 9,
-    },
-  ];
-
   useEffect(() => {
+    const db = getSupabase();
+    const reviews = db
+      .from("reviews")
+      .select("*")
+      .order("timestamp", { ascending: false });
+
     async function renderReviews(reviews: Review[]) {
       let tiles = reviews.map(async (review) => {
-        const { data, error } = await db
-          .from("albums")
-          .select()
-          .eq("album_id", review.album_id);
-        console.log(data);
-        let album = data && data.length > 0 && data[0];
+        let album = await getAlbum(review.album_id);
         return album ? (
           <div
             style={{
@@ -60,14 +41,7 @@ const Dashboard = () => {
               marginRight: "2rem",
             }}
           >
-            <img
-              alt="album cover"
-              src={album.cover_img}
-              width={150}
-              style={{
-                borderRadius: "1rem",
-              }}
-            />
+            <AlbumArt src={album.cover_img} size="" />
             <p>{album.name}</p>
           </div>
         ) : (
@@ -87,8 +61,13 @@ const Dashboard = () => {
       );
     }
 
-    renderReviews(reviews).then((data) => setReviewCarousel(data));
-  }, [reviews, db]);
+    reviews
+      .then((rev) => {
+        console.log(rev.data);
+        return renderReviews(rev.data as Review);
+      })
+      .then((data) => setReviewCarousel(data));
+  }, []);
 
   const albums: Album[] = [
     {

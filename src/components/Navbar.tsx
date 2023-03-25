@@ -1,7 +1,11 @@
 import { getAuth } from "firebase/auth";
+import { Router, useRouter } from "next/router";
+import { useState } from "react";
 
 const Navbar = () => {
   const auth = getAuth();
+  const [search, setSearch] = useState("");
+  const router = useRouter();
   return (
     <nav
       style={{
@@ -14,7 +18,22 @@ const Navbar = () => {
         marginRight: "2rem",
       }}
     >
-      <input type="text" />
+      <div>
+        <input
+          type="text"
+          onChange={(e) => setSearch(e.target.value)}
+          value={search}
+        />
+        <button
+          style={{ marginLeft: "1rem" }}
+          onClick={() => {
+            router.push(`/search?query=${search}`);
+          }}
+        >
+          Search
+        </button>
+      </div>
+
       <button
         onClick={() => {
           auth.signOut();

@@ -12,6 +12,12 @@ export type Album = {
   artist: string;
   release?: string;
   cover_img?: string;
+  tracks?: [Track];
+};
+
+export type Track = {
+  name: string;
+  length?: number;
 };
 
 export type Review = {
@@ -22,5 +28,5 @@ export type Review = {
   subtitle?: string;
   full_text?: string;
   track_ratings?: number[];
-	track_texts?: string[];
+  track_texts?: string[];
 };

@@ -6,7 +6,9 @@ const Carousel = ({
   children,
 }: React.PropsWithChildren<CarouselProps>) => {
   return (
-			<div style={{ display: "flex", flexDirection: "column", alignItems: "left" }}>
+    <div
+      style={{ display: "flex", flexDirection: "column", alignItems: "left" }}
+    >
       <h2>{label}</h2>
       <div
         style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
